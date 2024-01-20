@@ -1,6 +1,5 @@
 // This does mean dev enviroment uses Scrypt whereas prod uses argon2id
 // This shouldn't be a problem, it would be strange to import / export dev users to production?
-// This contains function that use a wasm worker in CF to speed up hasing and therefore login / logout
 import { dev } from "$app/environment";
 import { Scrypt } from "lucia";
 

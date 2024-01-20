@@ -41,7 +41,7 @@ export const initializeLucia = (platform: App.Platform | undefined) => {
     getSessionAttributes: (attributes) => {
       return {
         ipCountry: attributes.ip_country,
-        updatedAt: attributes.updated_at
+        updatedAt: attributes.update_at
       };
     },
   });
@@ -76,7 +76,7 @@ declare module "lucia" {
 
 interface DatabaseSessionAttributes {
   ip_country: string;
-  updated_at: string;
+  update_at: string;
 }
 interface DatabaseUserAttributes {
   email: string;

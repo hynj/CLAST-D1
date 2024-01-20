@@ -1,12 +1,11 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { insertUserSchema, user } from '$lib/server/schemas/luciaUser';
+import { insertUserSchema, user } from '$lib/server/schemas/auth';
 import type { Actions } from './$types';
 import { initializeLucia } from '$lib/server/lucia';
 import { generateId } from 'lucia';
-import { password as pschema } from '$lib/server/schemas/luciaUser'
+import { password as pschema } from '$lib/server/schemas/auth'
 import { flatten, safeParse } from 'valibot';
-import { argonHash } from '$lib/server/PHash';
-
+import { argonHash } from '$lib/server/hash-functions';
 import { drizzle } from 'drizzle-orm/d1';
 
 export const actions: Actions = {
@@ -14,19 +13,15 @@ export const actions: Actions = {
     const formData = Object.fromEntries(await request.formData());
     const result = safeParse(insertUserSchema, formData);
 
-    const db = drizzle(platform)
+    const db = drizzle(platform?.env.DB!)
     const lucia = initializeLucia(platform);
 
     if (result.success) {
       const username = result.output.email;
       const password = result.output.password;
       const name = result.output.name;
-      const deanery = result.output.deanery;
-      const hospital = result.output.hospital;
-      const yearOfTraining = result.output.year_of_training;
 
       try {
-        const startTime = Date.now();
         const userId = generateId(15);
         const hashedPassword = await argonHash(platform, password);
         if (!hashedPassword) throw new Error("Internal error");
@@ -35,9 +30,6 @@ export const actions: Actions = {
           id: userId,
           name: name,
           email: username,
-          deanery: deanery,
-          hospital: hospital,
-          year_of_training: yearOfTraining
         }).returning({ insertedID: user.id }).onConflictDoNothing({ target: user.id });
 
         if (!response?.length) {
@@ -66,8 +58,8 @@ export const actions: Actions = {
           });
         }
 
-
-        const session = await lucia.createSession(userId, { ip_country: 'England' });
+        const ipCountry = request.headers.get('cf-ipcountry') ?? 'dev';
+        const session = await lucia.createSession(userId, { ip_country: ipCountry, update_at: new Date().toISOString().slice(0, 19).replace('T', ' ') });
         const sessionCookie = lucia.createSessionCookie(session.id);
         cookies.set(sessionCookie.name, sessionCookie.value, {
           path: ".",
