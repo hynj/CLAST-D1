@@ -10,6 +10,8 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240117.0",
+    "@iarna/toml": "^2.2.5",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
@@ -26,8 +28,11 @@
   },
   "type": "module",
   "dependencies": {
+    "@lucia-auth/adapter-sqlite": "beta",
+    "bits-ui": "^0.15.1",
     "clsx": "^2.1.0",
     "drizzle": "^1.4.0",
+    "drizzle-kit": "^0.20.13",
     "drizzle-valibot": "^0.1.1",
     "lucia": "beta",
     "oslo": "^0.27.1",

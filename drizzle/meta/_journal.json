@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1705717273009,
+      "tag": "0000_sad_star_brand",
+      "breakpoints": true
+    }
+  ]
+}
