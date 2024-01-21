@@ -39,7 +39,7 @@ export const argonVerify = async (platform: App.Platform | undefined, hash: stri
     password: password,
     hash: hash
   }
-  const fetchHash = await Argon2Binding.fetch("https://workerbinding.com", {
+  const fetchHash = await Argon2Binding.fetch("https://internal/verify", {
     body: JSON.stringify(data),
     method: 'POST'
   })
