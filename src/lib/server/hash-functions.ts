@@ -10,21 +10,19 @@ export const argonHash = async (platform: App.Platform | undefined, password: st
   //TODO: Implement error handling, this should probably throw?
   if (!platform) return null;
 
-  const wasmI = platform.env.WASM;
+  const Argon2Binding = platform.env.WASM;
   const data = {
-    type: 'hash',
     password: password
   }
-  const fetchHash = await wasmI.fetch("https://workerbinding.com", {
-    headers: {
-      "X-Source": "Cloudflare-Workers",
-    },
+
+  const fetchHash = await Argon2Binding.fetch("https://internal/hash", {
     body: JSON.stringify(data),
     method: 'POST'
   })
 
   if (fetchHash.ok) {
-    return await fetchHash.text()
+    const { hash } = await fetchHash.json();
+    return hash;
   }
   return null;
 }
@@ -36,22 +34,19 @@ export const argonVerify = async (platform: App.Platform | undefined, hash: stri
   }
   if (!platform) return false;
 
-  const wasmI = platform.env.WASM;
+  const Argon2Binding = platform.env.WASM;
   const data = {
-    type: 'verify',
     password: password,
     hash: hash
   }
-  const fetchHash = await wasmI.fetch("https://workerbinding.com", {
-    headers: {
-      "X-Source": "Cloudflare-Workers",
-    },
+  const fetchHash = await Argon2Binding.fetch("https://workerbinding.com", {
     body: JSON.stringify(data),
     method: 'POST'
   })
 
   if (fetchHash.ok) {
-    return true;
+    const { matches } = await fetchHash.json();
+    if (matches) return true
   }
   return false
 }

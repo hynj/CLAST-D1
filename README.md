@@ -30,17 +30,25 @@ cd CLAST-D1
 bun install // or npm / pnpm ect...
 ```
 
-Make a new D1 Database with wrangler (or the web dashboard) and run the execute the sql file to get the authentication tables set up. If you haven't done before you will need to login with wrangler
+Make a new D1 Database with wrangler (or the web dashboard). If you haven't done before you will need to login with wrangler, replace YOUR_DB_NAME with a name of your choosing.
 
 ```bash
 bunx wrangler d1 create YOUR_DB_NAME
-bunx wrangler d1 execute YOUR_DB_NAME --local --file ./drizzle/0000_sad_star_brand.sql  
+```
+
+When you make a new database wrangler will return an ID, update the wrangler.toml file in the root directory with your new database ID and name. Leave the rest of the wrangler.toml unchanged.
+
+Next run the sql file to get the authentication tables set up.
+```bash
+bunx wrangler d1 execute YOUR_DB_NAME --local --file ./drizzle/0000_sad_star_brand.sql
+  
 ```
 Note you will need to run this without the "--local" prior to deploying
 
-When you make a new database wrangler will return an ID, update the wrangler.toml file in the root directory with your new database ID, leave the rest of the wrangler.toml unchanged.
 
-You can then run the dev server
+You can then run the dev server, this will be the familair defult sveltekit skeleton project with a few additions, the routes "login" and "register".  
+
+Use these routes to confirm everything is working.
 
 
 ## Developing
