@@ -5,7 +5,7 @@ import { custom, email, forward, merge, minLength, nullish, object, regex, strin
 
 export const user = sqliteTable('user', {
   id: text('id').primaryKey(),
-  email: text('email').notNull(),
+  email: text('email').notNull().unique(),
   email_verified: integer('email_verified', { mode: 'boolean' }).default(false),
   name: text('name').notNull(),
   roles: text('roles').default('USER'),
