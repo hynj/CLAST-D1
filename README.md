@@ -27,6 +27,8 @@ I'm using Bun via WSL, it works great and its much quicker. Start by cloning the
 # Clone this respository
 git clone https://github.com/hynj/CLAST-D1.git
 cd CLAST-D1
+rm -rf .git // Remove the git folder to start a fresh github repo
+git init -b main
 bun install // or npm / pnpm ect...
 ```
 
@@ -51,22 +53,73 @@ You can then run the dev server, this will be the familair defult sveltekit skel
 Use these routes to confirm everything is working.
 
 
-## Developing
+## Deploying to Cloudflare
 
 
 
-```bash
-bun run dev
-```
+### Set up D1
 
-## Building
-
-To create a production version of your app:
+Use wrangler to set up the database tables like above
 
 ```bash
-npm run build
+bunx wrangler d1 execute YOUR_DB_NAME --file ./drizzle/0000_sad_star_brand.sql
 ```
 
-You can preview the production build with `npm run preview`.
+### Compile and deploy worker for password hashing
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+We need to set up a replacement worker for password hashing, as node isn't available on the cloudflare worker runtime. 
+
+This repository has an example of using a rust wasm Argon2id implementation.   
+
+https://github.com/glotlabs/argon2-cloudflare
+
+We will use this to build a seperate cloudflare worker that we can access via a binding to perform the password hashing and verification. You will need rust installed to compile the wasm.  
+
+You could also use a pre-built wasm binary, there is one available at https://github.com/auth70/argon2-wasi  
+
+However you will need to wrap this in worker code to process the requests
+
+
+To build the worker, clone the glotlabs argon2-cloudflare repository and compile the worker, (install rust first rust-lang.org). You can follow the instructions in the github repo or follow the instructions below.
+
+```bash
+cd .. // Go back a directory
+git clone https://github.com/glotlabs/argon2-cloudflare.git
+cd argon2-cloudflare
+bun install
+bunx wrangler deploy
+
+```
+
+This will deploy a worker function to cloudflare with the name argon2.
+
+### Deploy aplication to cloudflare  
+
+Re-enter the main project directory (cd ../CLAST-D1)
+
+Make a new github repo https://github.com/new/
+
+Add you new repo as origin
+
+``` bash
+git add .
+git commit -m "first commit"
+git remote add origin https://github.com/<USERNAME>/<REPONAME>
+git push -u origin main
+
+```
+
+Make a new pages project on cloudflare using the dashboard, link you github project to it. Set framework to svelte, change build command as "bun run build" if using bun.
+
+Deploy your project, it should succeed but you won't be able to login. We need to bind our database and the hashing worker, continue to the project configuration and go to settings and then Functions.
+
+Scroll down and at the D1 Databse bidnings, bind the database you made to the variable name'DB'
+
+Then bind the worker function to the variable name 'WASM'
+
+
+
+
+
+
+
